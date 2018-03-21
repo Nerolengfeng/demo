@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.edu.jmun.mzgl.mapper.MzglMapper">
+	
+	
+	<!-- 基础库是否存在人员 -->
+	<select id="jcksfczCx" parameterType="MzglFB" resultType="RyjbxxbVB">
+		select grbh, sfzhm, xm, xb, nl, birthday, mz, telephone, phone, hkszdxzqh, jzszdxzqh, jzszdxx 
+		from ryjbxxb xxb
+		where xxb.sfzhm = #{sfzhm}
+	</select>
+	
+	<!-- 人员是否入库 -->
+	<select id="rysflhCx" parameterType="MzglFB" resultType="BrjbxxbVB">
+		SELECT brxx.grbh, brxx.ghkbh
+		FROM brjbxxb brxx, ryjbxxb xxb
+		WHERE brxx.grbh = xxb.grbh AND xxb.sfzhm = #{sfzhm}
+	</select>
+	
+	<!-- 人员挂号 -->
+	<insert id="ryghBc" parameterType="MzlcztbVB">
+		insert into mzlcztb(grbh, ghkbh, ghsj, lczt, sfwz, wzysid, sfqy, sfzy, sfjc, ssks) 
+		values 
+		(#{grbh}, #{ghkbh}, #{ghsj}, #{lczt}, #{sfwz}, #{wzysid}, #{sfqy}, #{sfzy}, #{sfjc}, #{ssks})
+	</insert>
+	
+	<!-- 插入人员基本信息表 -->
+	<insert id="insertRyjbxxb" parameterType="RyjbxxbVB">
+	insert into ryjbxxb (grbh, sfzhm, xm, xb, nl, birthday, mz, telephone, phone, hkszdxzqh, jzszdxzqh, jzszdxx) 
+	values (#{grbh}, #{sfzhm}, #{xm}, #{xb}, #{nl}, #{birthday}, #{mz}, #{telephone}, #{phone}, #{hkszdxzqh}, #{jzszdxzqh}, #{jzszdxx})
+	</insert>
+	
+	<!-- 更新人员基础信息表 -->
+	<update id="updateRyjcxxb" parameterType="RyjbxxbVB">
+		update ryjbxxb set xm = #{xm}, mz = #{mz}, telephone = #{telephone}, phone = #{phone}, hkszdxzqh = #{hkszdxzqh}, jzszdxzqh = #{jzszdxzqh}, jzszdxx = #{jzszdxx}
+		where grbh = #{grbh}
+	</update>
+	
+	<!-- 插入病人表 -->
+	<insert id="insertBrjbxxb" parameterType="BrjbxxbVB">
+		insert into brjbxxb (grbh, ghkbh, lrsj, lrrid, ryjk)
+		values (#{grbh}, #{ghkbh}, #{lrsj}, #{lrrid}, #{ryjk});
+	</insert>
+	
+	<!-- 当日挂号流程是否结束 -->
+	<select id="drghlcsfjs" parameterType="String" resultType="int">
+		SELECT COUNT(brxx.grbh) FROM brjbxxb brxx, ryjbxxb xxb, mzlcztb ztb 
+		WHERE brxx.grbh = xxb.grbh AND ztb.grbh = xxb.grbh AND ztb.ghkbh = brxx.ghkbh
+		AND ztb.lczt != '06'
+		AND SUBSTRING(ztb.ghsj,1,8) = #{ghrq}
+		AND xxb.sfzhm = #{sfzhm}
+	</select>
+	
+	<!-- 退号 -->
+	<update id="thBc" parameterType="cn.edu.jmun.mzgl.valuebean.MzlcztbVB">
+		UPDATE mzlcztb SET lczt = '06'
+		WHERE grbh = #{grbh}
+		AND ghkbh = #{ghkbh}
+		AND SUBSTRING(ghsj, 1, 8) = #{ghsj}
+	</update>
+	
+	<!-- 病人信息数查询 -->
+	<select id="brxxsCx" parameterType="MzglFB" resultType="int">
+		SELECT COUNT(xxb.grbh) 
+		FROM ryjbxxb xxb, brjbxxb brxx, mzlcztb lczt 
+		WHERE xxb.grbh = brxx.grbh AND brxx.grbh = lczt.grbh AND brxx.ghkbh = lczt.ghkbh AND lczt.lczt = #{lczt}
+		AND SUBSTRING(lczt.ghsj,1,8) = SUBSTRING(#{dqsj},1,8)
+		AND (lczt.ssks = #{ssks} 
+			or (SUBSTRING(#{ssks },3,4) = '00' AND SUBSTRING(lczt.ssks,1,2) = SUBSTRING(#{ssks },1,2))
+			)
+		<if test="sfzhm != ''">
+			and xxb.sfzhm = #{sfzhm}
+		</if>
+		<if test="xm != ''">
+			and xxb.xm like #{xm}
+		</if>
+	</select>
+	
+	
+	<!-- 病人信息查询 -->
+	<select id="brxxCx" parameterType="MzglFB" resultType="BrxxVB">
+		SELECT brxx.grbh, brxx.ghkbh, lczt.ghsj, xxb.sfzhm, xxb.xm, xxb.grbh, xxb.xb, xxb.nl, xxb.telephone, xxb.phone, xxb.jzszdxzqh
+		FROM ryjbxxb xxb, brjbxxb brxx, mzlcztb lczt 
+		WHERE xxb.grbh = brxx.grbh AND brxx.grbh = lczt.grbh AND brxx.ghkbh = lczt.ghkbh AND lczt.lczt = #{lczt}
+		AND SUBSTRING(lczt.ghsj,1,8) = SUBSTRING(#{dqsj},1,8)
+		AND (lczt.ssks = #{ssks} 
+			or (SUBSTRING(#{ssks },3,4) = '00' AND SUBSTRING(lczt.ssks,1,2) = SUBSTRING(#{ssks },1,2))
+			)
+		<if test="sfzhm != ''">
+			and xxb.sfzhm = #{sfzhm}
+		</if>
+		<if test="xm != ''">
+			and xxb.xm like #{xm}
+		</if>
+		limit #{startRows},#{endRows}
+	</select>
+	
+	<!-- 人员基本信息查询 -->
+	<select id="ryjbxxCx" parameterType="MzglFB" resultType="RyjbxxbVB">
+		select grbh, sfzhm, xm, xb, nl, birthday, mz, telephone, phone, hkszdxzqh, jzszdxzqh, jzszdxx 
+		from ryjbxxb xxb
+		where xxb.grbh = #{grbh}
+	</select>
+	
+	<!-- 药物新增 -->
+	<insert id="ykxz" parameterType="MzglFB">
+		insert into ywxxdmb (dmmc, jg) values (#{ywmc}, #{ywdj})
+	</insert>
+	
+	<!-- 药物是否存在查询 -->
+	<select id="ywsfczCx" parameterType="MzglFB" resultType="int">
+		select count(*) from ywxxdmb where sfyx = '1' and dmmc = #{ywmc}
+	</select>
+	
+	<!-- 药物数查询 -->
+	<select id="ywsCx" parameterType="MzglFB" resultType="int">
+		select count(dmid) from ywxxdmb where sfyx = '1' 
+		<if test="ywmc != ''">
+			and dmmc = #{ywmc}
+		</if>
+	</select>
+	
+	<!-- 药物查询 -->
+	<select id="ywCx" parameterType="MzglFB" resultType="YwxxVB">
+		select dmid, dmmc, jg from ywxxdmb where sfyx = '1'
+		<if test="ywmc != ''">
+			and dmmc = #{ywmc}
+		</if>
+		limit #{startRows},#{endRows}
+	</select>
+	
+	<!-- 药物删除 -->
+	<update id="ywsc" parameterType="MzglFB">
+		update ywxxdmb set sfyx = '0' where dmid = #{dmid}
+	</update>
+	
+	<!-- 获得药物信息代码表 -->
+	<select id="getYwxxDmb" parameterType="String" resultType="YwxxVB" >
+		select dmid, dmmc, jg from ${tablename} where sfyx = '1'
+	</select>
+	
+	<!-- 更新流程状态表 -->
+	<update id="updateLcztb" parameterType="MzlcztbVB">
+		update mzlcztb set lczt = #{lczt}, sfwz = #{sfwz},  wzysid = #{wzysid}, sfqy = #{sfqy}, sfzy = #{sfzy}, sfjc = #{sfjc}
+		where grbh = #{grbh} and ghkbh = #{ghkbh} and ghsj = #{ghsj}
+	</update>
+	
+	<!-- 插入病人拿药信息表 -->
+	<insert id="insertBrnyxxb" parameterType="BrnyxxbVB">
+		insert into brnyxxb (grbh, ghkbh, wzbh, ypbh, ypfs, sfjf, jnje, sfly)
+		values (#{grbh}, #{ghkbh}, #{wzbh}, #{ypbh}, #{ypfs}, #{sfjf}, #{jnje}, #{sfly})
+	</insert>
+	
+	<!-- 插入病人检查信息表 -->
+	<insert id="insertBrjcxb" parameterType="BrjcxbVB">
+		insert into brjcxb (grbh, ghkbh, wzbh, jcdm, sfjf, jnje, sfjc, jcsm)
+		values (#{grbh}, #{ghkbh}, #{wzbh}, #{jcdm}, #{sfjf}, #{jnje}, #{sfjc}, #{jcsm})
+	</insert>
+	
+	<!-- 插入病人问诊情况表 -->
+	<insert id="insertBrwzqkb" parameterType="BrwzqkbVB">
+		insert into brwzqkb (grbh, ghkbh, wzbh, wzsj, ysbh, zysx, ghsj)
+		values (#{grbh}, #{ghkbh}, #{wzbh}, #{wzsj}, #{ysbh}, #{zysx}, #{ghsj})
+	</insert>
+	
+	<!-- 检查记录数查询 -->
+	<select id="jcjlsCx" parameterType="MzglFB" resultType="int">
+		SELECT count(xxb.grbh)
+		FROM ryjbxxb xxb, brjbxxb brxx, mzlcztb lczt, brwzqkb qkb
+		WHERE xxb.grbh = brxx.grbh AND brxx.grbh = lczt.grbh AND brxx.ghkbh = lczt.ghkbh AND qkb.grbh = lczt.grbh AND qkb.ghkbh = lczt.ghkbh AND qkb.ghsj = lczt.ghsj
+  		AND lczt.lczt = '02'
+		AND SUBSTRING(lczt.ghsj, 1, 8) = SUBSTRING(#{dqsj}, 1, 8)
+		AND lczt.sfjf = '1'
+		AND EXISTS (SELECT '' FROM brjcxb jcb WHERE jcb.wzbh = qkb.wzbh)
+		<if test="sfzhm != ''">
+			and xxb.sfzhm = #{sfzhm}
+		</if>
+		<if test="xm != ''">
+			and xxb.xm like #{xm}
+		</if>
+	</select>
+	
+	<!-- 检查记录查询 -->
+	<select id="jcjlCx" parameterType="MzglFB" resultType="BrxxVB">
+		SELECT brxx.grbh, brxx.ghkbh, qkb.wzbh, lczt.ghsj, xxb.sfzhm, xxb.xm, xxb.grbh, xxb.xb, xxb.nl, xxb.telephone, xxb.phone, xxb.jzszdxzqh
+		FROM ryjbxxb xxb, brjbxxb brxx, mzlcztb lczt, brwzqkb qkb
+		WHERE xxb.grbh = brxx.grbh AND brxx.grbh = lczt.grbh AND brxx.ghkbh = lczt.ghkbh AND qkb.grbh = lczt.grbh AND qkb.ghkbh = lczt.ghkbh AND qkb.ghsj = lczt.ghsj
+  		AND lczt.lczt = '02'
+		AND SUBSTRING(lczt.ghsj, 1, 8) = SUBSTRING(#{dqsj}, 1, 8) 
+		AND lczt.sfjf = '1'
+		AND EXISTS (SELECT '' FROM brjcxb jcb WHERE jcb.wzbh = qkb.wzbh)
+		<if test="sfzhm != ''">
+			and xxb.sfzhm = #{sfzhm}
+		</if>
+		<if test="xm != ''">
+			and xxb.xm like #{xm}
+		</if>
+		limit #{startRows},#{endRows}
+	</select>
+	
+	<!-- 缴费病人查数查询 -->
+	<select id="jfbrsCx" parameterType="MzglFB" resultType="int">
+		SELECT count(xxb.grbh)
+		FROM ryjbxxb xxb, brjbxxb brxx, mzlcztb lczt, brwzqkb qkb
+		WHERE xxb.grbh = brxx.grbh AND brxx.grbh = lczt.grbh AND brxx.ghkbh = lczt.ghkbh AND qkb.grbh = lczt.grbh AND qkb.ghkbh = lczt.ghkbh AND qkb.ghsj = lczt.ghsj
+  		AND lczt.lczt = '02'
+		AND SUBSTRING(lczt.ghsj, 1, 8) = SUBSTRING(#{dqsj}, 1, 8)
+		AND lczt.sfjf = '0'
+		AND (EXISTS (SELECT '' FROM brjcxb jcb WHERE jcb.wzbh = qkb.wzbh)
+		OR EXISTS (SELECT '' FROM brnyxxb nyb WHERE nyb.wzbh = qkb.wzbh))
+		<if test="sfzhm != ''">
+			and xxb.sfzhm = #{sfzhm}
+		</if>
+		<if test="xm != ''">
+			and xxb.xm like #{xm}
+		</if>
+	</select>
+	
+	<!-- 缴费病人查询 -->
+	<select id="jfbrCx" parameterType="MzglFB" resultType="BrxxVB">
+		SELECT brxx.grbh, brxx.ghkbh, lczt.ghsj, xxb.sfzhm, xxb.xm, xxb.grbh, xxb.xb, xxb.nl, xxb.telephone, xxb.phone, xxb.jzszdxzqh, qkb.wzbh
+		FROM ryjbxxb xxb, brjbxxb brxx, mzlcztb lczt, brwzqkb qkb
+		WHERE xxb.grbh = brxx.grbh AND brxx.grbh = lczt.grbh AND brxx.ghkbh = lczt.ghkbh AND qkb.grbh = lczt.grbh AND qkb.ghkbh = lczt.ghkbh AND qkb.ghsj = lczt.ghsj
+  		AND lczt.lczt = '02'
+		AND SUBSTRING(lczt.ghsj, 1, 8) = SUBSTRING(#{dqsj}, 1, 8) 
+		AND lczt.sfjf = '0'
+		AND (EXISTS (SELECT '' FROM brjcxb jcb WHERE jcb.wzbh = qkb.wzbh)
+		OR EXISTS (SELECT '' FROM brnyxxb nyb WHERE nyb.wzbh = qkb.wzbh))
+		<if test="sfzhm != ''">
+			and xxb.sfzhm = #{sfzhm}
+		</if>
+		<if test="xm != ''">
+			and xxb.xm like #{xm}
+		</if>
+		limit #{startRows},#{endRows}
+	</select>
+	
+	<!--检查收费查询-->
+	<select id="jcsfCx" parameterType="MzglFB" resultType="cn.edu.jmun.mzgl.valuebean.BrjcxbVB">
+		SELECT jcb.jcdm, jcb.jnje FROM brjcxb jcb 
+		WHERE jcb.grbh = #{grbh} AND jcb.ghkbh = #{ghkbh} AND jcb.wzbh = #{wzbh}
+	</select>
+	
+	<!--药物收费查询-->
+	<select id="ywsfCx" parameterType="MzglFB" resultType="cn.edu.jmun.mzgl.valuebean.BrnyxxbVB">
+		SELECT nyb.ypbh, nyb.jnje, nyb.ypfs FROM brnyxxb nyb
+		WHERE nyb.grbh = #{grbh} AND nyb.ghkbh = #{ghkbh} AND nyb.wzbh = #{wzbh} 
+	</select>
+	
+	<!-- 流程状态表缴费 -->
+	<update id="lcztbJf" parameterType="MzglFB">
+		update mzlcztb set sfjf='1'
+		where grbh = #{grbh} and ghkbh = #{ghkbh} and ghsj = #{ghsj} 
+	</update>
+	
+	<!-- 检查表缴费 -->
+	<update id="jcbJf" parameterType="MzglFB">
+		update brjcxb set sfjf='1'
+		where grbh = #{grbh} and ghkbh = #{ghkbh} and wzbh = #{wzbh} 
+	</update>
+	
+	<!-- 拿药表缴费 -->
+	<update id="nybJf" parameterType="MzglFB">
+		update brnyxxb set sfjf='1'
+		where grbh = #{grbh} and ghkbh = #{ghkbh} and wzbh = #{wzbh} 
+	</update>
+	
+	<!-- 疾病信息查询 -->
+	<select id="jbxxCx" parameterType="String" resultType="JbdmbVB">
+		SELECT dmid, dmmc FROM jbdmb
+		WHERE (SUBSTRING(#{ssks},1,2) = SUBSTRING(ssks,1,2) AND SUBSTRING(#{ssks},3,4) = '00')
+		OR ssks = #{ssks}
+	</select>
+	
+	<!-- 插入病人病情表 -->
+	<insert id="insertBrbqb" parameterType="BrbqbVB">
+		insert into brbqb (grbh, ghkbh, wzbh, jbdm, jbbx, yzcd) 
+		values (#{grbh}, #{ghkbh}, #{wzbh}, #{jbdm}, #{jbbx}, #{yzcd}) 
+	</insert>
+	
+</mapper>
+
+
+
+
+
+
+
+
+

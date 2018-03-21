@@ -1,0 +1,26 @@
+@charset "utf-8";
+/* CSS Document */
+*{margin:0;padding:0;word-break:break-all;word-wrap: break-word; font-family:"Microsoft Yahei", Verdana, Arial, Helvetica, sans-serif; font-size: 14px}
+a{color:#185697;text-decoration:none;}
+a:hover {text-decoration:none;color:#f30;}
+Img{border:0;vertical-align:middle;}
+ul{list-style-type:none;}
+input, select{vertical-align:middle;}
+body{font-size:12px; line-height:22px;color:#333;}
+textarea{resize: none;}
+
+.mbx{color:#185697; font-size:13px; margin-bottom:10px; font-weight:100; border-bottom:1px #ddd dotted; line-height:30px;}
+
+/*.cztable{padding:15px 0;}*/
+.cztable table{border-bottom:#cfe1f9 solid 4px;border-right:#cfe1f9 solid 1px;}
+.cztable td, .cztable th{border-top:#cfe1f9 solid 1px; border-left:#cfe1f9 solid 1px; padding:6px 5px; }
+.cztable th{background:#eef7fc url(../img/bgtable.jpg) repeat-x; line-height:22px; color:#185697;}
+.cztable td a{color:#185697;}
+.cztable .xxleft{text-align:left;}
+.cztable tr:hover{background-color:#f5fcff}
+
+.input2{background:url(../img/bginput.gif) repeat-x top; height:20px; overflow:hidden; border:1px #949494 solid; padding:0 10px; cursor:pointer; font-size:12px;}
+.input_2{border-top:1px #999 solid; border-left:1px #999 solid; background:#fff url(../img/bg_inputbg.jpg) repeat-x top; border-bottom:1px #ddd solid; border-right:1px #ddd solid; padding:2px;color:#333; line-height:18px; font-size:12px;}
+
+
+

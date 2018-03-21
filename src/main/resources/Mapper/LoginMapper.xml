@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+
+
+<mapper namespace="cn.edu.jmun.common.mapper.LoginMapper">
+
+	<!-- 用户登录 -->
+	<select id="login" parameterType="LoginFB" resultType="cn.edu.jmun.common.SessionConfig" >
+		SELECT xxb.grbh, sfzhm, xm, xb, nl, birthday, mz, telephone, phone, hkszdxzqh, jzszdxzqh, jzszdxx, whcd, ssks, rysf, byyx, sxzy, ysdj, njts, jbgz 
+		FROM ryjbxxb xxb, ywryxxb ywry, ywryzhxxb zhxx 
+		WHERE xxb.grbh = ywry.grbh AND xxb.grbh = zhxx.grbh
+		AND zhxx.zhbm = #{username} AND zhxx.zhmm = #{password}
+	</select>
+	
+</mapper>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+
+
+<mapper namespace="cn.edu.jmun.common.mapper.RegionMapper">
+
+	<!-- 获取行政区划代码 -->
+	<select id="getXzqhData" parameterType="RegionFB" resultType="RegionVB" >
+		select id,name,pid,sort,level,longcode,code from region where level = #{level}
+		<if test="longcode != null">
+			and longcode like #{longcode}
+		</if>
+		order by longcode
+	</select>
+	
+	<select id="getXzqhName" parameterType="RegionFB" resultType="String">
+		select name from region where longcode in (#{szs},#{szq},#{szx},#{szz},#{szc})
+	</select>
+	
+</mapper>

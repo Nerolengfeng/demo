@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+
+<mapper namespace="cn.edu.jmun.rygl.mapper.RyglMapper">
+	
+	<!-- 根据身份证获取一个人的信息 -->
+	<select id="getRyxxBySfzhm" parameterType="String" resultType="YwryPojoVB">
+		select ryxx.grbh as "ryxx.grbh",sfzhm as "ryxx.sfzhm",xm as "ryxx.xm",xb as "ryxx.xb",nl as "ryxx.nl",birthday as "ryxx.birthday",mz as "ryxx.mz",telephone as "ryxx.telephone",phone as "ryxx.phone",hkszdxzqh as "ryxx.hkszdxzqh",jzszdxzqh as "ryxx.jzszdxzqh",jzszdxx as "ryxx.jzszdxx",zzmm as "ywry.zzmm",whcd as "ywry.whcd",ssks as "ywry.ssks",rysf as "ywry.rysf",byyx as "ywry.byyx",sxzy as "ywry.sxzy",ysdj as "ywry.ysdj",njts as "ywry.njts",jbgz as "ywry.jbgz",czyid as "ywry.czyid",czsj as "ywry.czsj"
+		from ryjbxxb ryxx left join ywryxxb ywry on ryxx.grbh = ywry.grbh
+		where sfzhm = #{sfzhm}
+	</select>
+	
+	<!-- 插入人员基本信息表 -->
+	<insert id="insertRyjbxxb" parameterType="RyjbxxbVB">
+	insert into ryjbxxb (grbh, sfzhm, xm, xb, nl, birthday, mz, telephone, phone, hkszdxzqh, jzszdxzqh, jzszdxx) 
+	values (#{grbh}, #{sfzhm}, #{xm}, #{xb}, #{nl}, #{birthday}, #{mz}, #{telephone}, #{phone}, #{hkszdxzqh}, #{jzszdxzqh}, #{jzszdxx})
+	</insert>
+	
+	<!-- 插入医务人员信息表 -->
+	<insert id="insertYwryxxb" parameterType="YwryxxbVB">
+	insert into ywryxxb (grbh, zzmm, whcd, ssks, rysf, byyx, sxzy, ysdj, njts, jbgz, czyid, czsj) 
+	values (#{grbh}, #{zzmm}, #{whcd}, #{ssks}, #{rysf}, #{byyx}, #{sxzy}, #{ysdj}, #{njts}, #{jbgz}, #{czyid}, #{czsj})
+	</insert>
+	
+	<!-- 插入医务人员账号信息表 -->
+	<insert id="insertYwryzhxxb" parameterType="YwryzhxxbVB">
+	insert into ywryzhxxb (grbh, zhbm, zhmm, sfyx) 
+	values (#{grbh}, #{zhbm}, #{zhmm}, '1')
+	</insert>
+	
+	<!-- 查看账号信息是否存在 -->
+	<select id="getZhsfcz" parameterType="String" resultType="int">
+		select count(zhbm) from ywryzhxxb where zhbm = #{zhbm}
+	</select>
+	
+	<!-- 人员信息数查询 -->
+	<select id="ryxxsCx" parameterType="YwryxxFB" resultType="int">
+		select count(ryxx.grbh) from ryjbxxb ryxx, ywryxxb ywry where ryxx.grbh = ywry.grbh
+		<if test="sfzhm != ''">
+			and ryxx.sfzhm = #{sfzhm}
+		</if>
+		<if test="xm != ''">
+			and ryxx.xm like #{xm}
+		</if>
+	</select>
+	
+	<!-- 人员信息查询 -->
+	<select id="ryxxCx" parameterType="YwryxxFB" resultType="YwryPojoVB">
+		select ryxx.grbh as "ryxx.grbh", ryxx.sfzhm as "ryxx.sfzhm", ryxx.xm as "ryxx.xm", ryxx.xb as "ryxx.xb",ryxx.jzszdxzqh as "ryxx.jzszdxzqh", ryxx.telephone as "ryxx.telephone", ryxx.phone as "ryxx.phone" from ryjbxxb ryxx, ywryxxb ywry where ryxx.grbh = ywry.grbh
+		<if test="sfzhm != ''">
+			and ryxx.sfzhm = #{sfzhm}
+		</if>
+		<if test="xm != ''">
+			and ryxx.xm like #{xm}
+		</if>
+		limit #{startRows},#{endRows}
+	</select>
+	
+	<!-- 根据个人编号获取一个人的信息 -->
+	<select id="getRyxxByGrbh" parameterType="String" resultType="YwryPojoVB">
+		select ryxx.grbh as "ryxx.grbh",sfzhm as "ryxx.sfzhm",xm as "ryxx.xm",xb as "ryxx.xb",nl as "ryxx.nl",birthday as "ryxx.birthday",mz as "ryxx.mz",telephone as "ryxx.telephone",phone as "ryxx.phone",hkszdxzqh as "ryxx.hkszdxzqh",jzszdxzqh as "ryxx.jzszdxzqh",jzszdxx as "ryxx.jzszdxx",zzmm as "ywry.zzmm",whcd as "ywry.whcd",ssks as "ywry.ssks",rysf as "ywry.rysf",byyx as "ywry.byyx",sxzy as "ywry.sxzy",ysdj as "ywry.ysdj",njts as "ywry.njts",jbgz as "ywry.jbgz",czyid as "ywry.czyid",czsj as "ywry.czsj",zhxx.zhbm as "zhxx.zhbm", zhxx.zhmm as "zhxx.zhmm"
+		from ryjbxxb ryxx, ywryxxb ywry, ywryzhxxb zhxx where ryxx.grbh = ywry.grbh and ryxx.grbh = zhxx.grbh
+		and ryxx.grbh = #{grbh}
+	</select>
+	
+	<!-- 更新人员基础信息表 -->
+	<update id="updateRyjcxxb" parameterType="RyjbxxbVB">
+		update ryjbxxb set xm = #{xm}, mz = #{mz}, telephone = #{telephone}, phone = #{phone}, hkszdxzqh = #{hkszdxzqh}, jzszdxzqh = #{jzszdxzqh}, jzszdxx = #{jzszdxx}
+		where grbh = #{grbh}
+	</update>
+	
+	<!-- 更新医务人员人员信息表 -->
+	<update id="updateYwryxxb" parameterType="YwryxxbVB">
+		update ywryxxb set zzmm = #{zzmm}, whcd = #{whcd}, ssks = #{ssks}, rysf = #{rysf}, byyx = #{byyx}, sxzy = #{sxzy}, ysdj = #{ysdj}, njts = #{njts}, jbgz = #{jbgz} 
+		where grbh = #{grbh}
+	</update>
+	
+	<!-- 更新医务人员账号信息表 -->
+	<update id="updateYwryzhxxb" parameterType="YwryzhxxbVB">
+		update ywryzhxxb set zhmm = #{zhmm}  where grbh = #{grbh} and zhbm = #{zhbm} 
+	</update>
+	
+	<!-- 删除医务人员信息 -->
+	<delete id="delYwry" parameterType="String">
+		delete from ywryxxb where grbh = #{grbh}
+	</delete>
+	
+	<!-- 删除医务人员账号信息 -->
+	<delete id="delYwryzh" parameterType="String">
+		delete from ywryzhxxb where grbh = #{grbh}
+	</delete>
+	
+	<!-- 插入请假表 -->
+	<insert id="insertYwryqjb" parameterType="YwryqjbVB">
+		insert into ywryqjb (grbh, qjsjq, qjsjz, qjsc, qjlb, qjyy, qjrq, fzrid) 
+		values (#{grbh}, #{qjsjq}, #{qjsjz}, #{qjsc}, #{qjlb}, #{qjyy}, #{qjrq}, #{fzrid})
+	</insert>
+	
+	<!-- 判断是否已经请假 -->
+	<select id="sfyyqj"  parameterType="YwryqjbVB" resultType="int">
+		SELECT count(*) 
+		FROM ywryqjb 
+		WHERE grbh = #{grbh} 
+		AND (qjsjq &lt;= #{qjsjq} and qjsjz &gt;= #{qjsjq}) 
+		OR (qjsjq &lt;= #{qjsjz} and qjsjz &gt;= #{qjsjz})
+		OR (#{qjsjq} &lt;= qjsjq and #{qjsjz} &gt;= qjsjq)
+		OR (#{qjsjq} &lt;= qjsjz and #{qjsjz} &gt;= qjsjz)
+	</select>
+	
+	<!-- 人员请假信息查询 -->
+	<select id="qjryxxCx" parameterType="YwryxxFB" resultType="YwryPojoVB">
+		select ryxx.grbh as "ryxx.grbh", ryxx.sfzhm as "ryxx.sfzhm", ryxx.xm as "ryxx.xm", ryxx.xb as "ryxx.xb",ryxx.jzszdxzqh as "ryxx.jzszdxzqh", ryxx.telephone as "ryxx.telephone",ryxx.phone as "ryxx.phone", count(*)  as "qjcs" from ryjbxxb ryxx, ywryxxb ywry, ywryqjb ryqj
+		where ryxx.grbh = ywry.grbh and ryxx.grbh = ryqj.grbh
+		<if test="sfzhm != ''">
+			and ryxx.sfzhm = #{sfzhm}
+		</if>
+		<if test="xm != ''">
+			and ryxx.xm like #{xm}
+		</if>
+		group by ryxx.grbh, ryxx.sfzhm,ryxx.xb,ryxx.jzszdxx,ryxx.telephone,ryxx.phone
+		limit #{startRows},#{endRows}
+	</select>
+	
+	<!-- 请假信息数查询 -->
+	<select id="qjryxxsCx" parameterType="YwryxxFB" resultType="int">
+		select count(*) from ( select '' from ryjbxxb ryxx, ywryxxb ywry, ywryqjb ryqj
+		where ryxx.grbh = ywry.grbh and ryxx.grbh = ryqj.grbh
+		<if test="sfzhm != ''">
+			and ryxx.sfzhm = #{sfzhm}
+		</if>
+		<if test="xm != ''">
+			and ryxx.xm like #{xm}
+		</if>
+		group by ryxx.grbh ) a
+	</select>
+	
+	<!-- 请假记录详情 -->
+	<select id="qjjlxx" parameterType="String" resultType="YwryqjbVB">
+		select qjsjq, qjsjz, qjsc, qjlb, qjyy, qjrq, fzrid
+		from ywryqjb where grbh = #{grbh}
+	</select>
+	
+	<!-- 删除请假记录 -->
+	<delete id="delQjjl" parameterType="YwryxxFB">
+		delete from ywryqjb where grbh = #{grbh} and qjsjq = #{qjsjq} and qjsjz = #{qjsjz}
+	</delete>
+	
+	<!-- 可考核人员数查询 -->
+	<select id="kkhrysCx" parameterType="YwryxxFB" resultType="int">
+		select count(ryxx.grbh) 
+		from ryjbxxb ryxx, ywryxxb ywry
+		where ryxx.grbh = ywry.grbh
+		<if test="sfzhm != ''">
+			and ryxx.sfzhm = #{sfzhm}
+		</if>
+		<if test="xm != ''">
+			and ryxx.xm like #{xm}
+		</if>
+		and not exists (select '' from ywryjxkhb khb where khb.grbh = ryxx.grbh and khb.khny = #{nowYM})
+	</select>
+	
+	<!-- 可考核人员查询 -->
+	<select id="kkhryCx" parameterType="YwryxxFB" resultType="YwryPojoVB">
+		select ryxx.grbh as "ryxx.grbh", ryxx.sfzhm as "ryxx.sfzhm", ryxx.xm as "ryxx.xm", ryxx.xb as "ryxx.xb",ywry.ssks as "ywry.ssks", ywry.rysf as "ywry.rysf", ywry.ysdj as "ywry.ysdj", ryxx.telephone as "ryxx.telephone", ryxx.phone as "ryxx.phone" 
+		from ryjbxxb ryxx, ywryxxb ywry
+		where ryxx.grbh = ywry.grbh
+		<if test="sfzhm != ''">
+			and ryxx.sfzhm = #{sfzhm}
+		</if>
+		<if test="xm != ''">
+			and ryxx.xm like #{xm}
+		</if>
+		and not exists (select '' from ywryjxkhb khb where khb.grbh = ryxx.grbh and khb.khny = #{nowYM})
+		limit #{startRows},#{endRows}
+	</select>
+	
+	<!-- 人员考核保存 -->
+	<insert id="rykhBc" parameterType="YwryjxkhbVB">
+		insert into ywryjxkhb (grbh, khny, khx, khfs, czsj, czrid) values (#{grbh}, #{khny}, #{khx}, #{khfs}, #{czsj}, #{czrid})
+	</insert>
+	
+	<!-- 人员考核记录查询 -->
+	<select id="rykhjlCx" parameterType="YwryxxFB" resultType="YwryPojoVB">
+		SELECT a.grbh as "ryxx.grbh", a.sfzhm as "ryxx.sfzhm", a.xm as "ryxx.xm",
+		SUM(IF(a.khx = '01', a.khfs, 0)) as "jxkh.zsgzsj", SUM(IF(a.khx = '02', a.khfs, 0)) as "jxkh.zrsg",
+		SUM(IF(a.khx = '03', a.khfs, 0)) as "jxkh.zsjl", SUM(IF(a.khx = '04', a.khfs, 0)) as "jxkh.gztd",
+		SUM(IF(a.khx = '05', a.khfs, 0)) as "jxkh.rwwcqk", SUM(IF(a.khx = '06', a.khfs, 0)) as "jxkh.gzhgx",
+		SUM(IF(a.khx = '07', a.khfs, 0)) as "jxkh.gzzl"
+		FROM (	SELECT xxb.grbh,xxb.sfzhm,xxb.xm,jxb.khx,jxb.khfs
+				FROM ryjbxxb xxb, ywryxxb ywry, ywryjxkhb jxb
+				WHERE xxb.grbh = ywry.grbh AND xxb.grbh = jxb.grbh
+				<if test="sfzhm != ''">
+					and xxb.sfzhm = #{sfzhm}
+				</if>
+				<if test="xm != ''">
+					and xxb.xm like #{xm}
+				</if>
+				<if test="khny != ''">
+					and jxb.khny = #{khny}
+				</if>
+		) a GROUP BY a.grbh, a.sfzhm, a.xm 
+		limit #{startRows},#{endRows}
+	</select>
+	
+	<!-- 人员考核记录数查询-->
+	<select id="rykhjlsCx" parameterType="YwryxxFB" resultType="int">
+		SELECT count(distinct xxb.grbh)
+		FROM ryjbxxb xxb, ywryxxb ywry, ywryjxkhb jxb
+		WHERE xxb.grbh = ywry.grbh AND xxb.grbh = jxb.grbh
+		<if test="sfzhm != ''">
+			and xxb.sfzhm = #{sfzhm}
+		</if>
+		<if test="xm != ''">
+			and xxb.xm like #{xm}
+		</if>
+		<if test="khny != ''">
+			and jxb.khny = #{khny}
+		</if>
+	</select>
+	
+	<!-- 是否签到或签退 -->
+	<select id="sfQdQt" parameterType="YwryxxFB" resultType="int">
+		SELECT COUNT(grbh) FROM ywrykqb
+		WHERE kqrq = #{kqrq} AND qdqt = #{qdqt} AND grbh = #{grbh}
+	</select>
+	
+	<!-- 否签到或签退 -->
+	<insert id="qdQtBc" parameterType="YwryxxFB">
+		insert into ywrykqb (grbh, kqrq, dksj, sfcd, sfzt, qdqt) values (#{grbh}, #{kqrq}, #{dksj}, #{sfcd}, #{sfzt}, #{qdqt})
+	</insert>
+	
+	<!-- 再次签退 -->
+	<insert id="zcQt" parameterType="YwryxxFB">
+		update ywrykqb  set dksj = #{dksj}, sfzt = #{sfzt}
+		where qdqt = #{qdqt} and grbh = #{grbh} and kqrq = #{kqrq} 
+	</insert>
+	
+	<!-- 考勤记录查询 -->
+	<select id="kqjlCx" parameterType="YwryxxFB" resultType="KqjlVB">
+		SELECT kqrq as "kqrq", SUM(IF(qdqt = '1', dksj , NULL)) as "dksjz", SUM(IF(qdqt = '1', sfcd , NULL)) as "sfcd", SUM(IF(qdqt = '2', dksj , NULL)) as "dksjw", SUM(IF(qdqt = '2', sfzt , NULL)) as "sfzt"
+		FROM ywrykqb
+		WHERE grbh = #{grbh}
+		AND kqrq &gt;= #{sjq}
+		AND kqrq &lt;= #{sjz}
+  		GROUP BY kqrq
+		limit #{startRows},#{endRows}
+	</select>
+	
+	<!-- 考勤记录数查询 -->
+	<select id="kqjlsCx" parameterType="YwryxxFB" resultType="int">
+		SELECT count(distinct kqrq)
+		FROM ywrykqb
+		WHERE grbh = #{grbh}
+		AND kqrq &gt;= #{sjq}
+		AND kqrq &lt;= #{sjz}
+	</select>
+	
+	<!-- 工资查询 -->
+	<select id="rygzCx" parameterType="YwryxxFB" resultType="JbgzVB" >
+		SELECT jbgz, jxgz, qjkcgz, zgz FROM ywrygzb
+		WHERE ffny = #{gzffsj}	AND grbh = #{grbh}
+	</select>
+</mapper>
+
+
+
+
+
+
+
+
